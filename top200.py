@@ -11,7 +11,7 @@ print("Fetching top tracks")
 top_tracks = get_top_tracks("14/09/2022", "30/09/2022")
 trackIdList = []
 tracks = []
-for top_track in top_tracks[:3]:
+for top_track in top_tracks[:50]:
     new_track_features = {}
     print(f"Loading {top_track['title']} by {top_track['artist']}", )
     trackIdList.append(top_track['id'])
@@ -31,4 +31,4 @@ for i in range(0, len(trackIdList), 100):
         df.loc[len(df.index)] = tracks[j]
 
 print("Saving data")
-df.to_csv('data.csv', index=False)
+df.to_csv('top200.csv', index=False)
