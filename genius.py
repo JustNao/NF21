@@ -21,15 +21,24 @@ def get_song_lyrics_url(title: str) -> str:
     for hit in search_result['response']['hits']:
         if hit['result']['artist_names'].lower() != "spotify":
             return hit['result']['url']
-    return search_result['response']['hits'][0]['result']['url']
+    if len(search_result['response']['hits']) > 0:
+        return search_result['response']['hits'][0]['result']['url']
+    else:
+        return None
 
 
 def get_lyrics(title: str) -> str:
     lyrics_url = get_song_lyrics_url(title)
+    if lyrics_url is None:
+        return ""
+
     lyrics_page = rq.get(lyrics_url)
     soup = bs(lyrics_page.text, 'html.parser')
     data_container = soup.find('div', attrs={
         'data-lyrics-container': True
     })
+    if data_container is None:
+        return ""
+
     lyrics = data_container.get_text(separator='\n')
     return lyrics
