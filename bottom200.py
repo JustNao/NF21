@@ -91,8 +91,10 @@ for i in range(0, len(track_id_list), 100):
     audio_features = get_audio_features(','.join(track_id_list[start:end]))
     k = 0
     for j in range(start, end):
-        final_tracks[j].update(audio_features[k])
-        output_df.loc[len(output_df.index)] = final_tracks[j]
+        if audio_features[k] is None:
+            output_df.loc[len(output_df.index)] = final_tracks[j]
+        else:
+            output_df.loc[len(output_df.index)] = final_tracks[j] | audio_features[k]
         k += 1
 
 print("Saving data")
