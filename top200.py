@@ -8,10 +8,10 @@ columns = ['title', 'artist', 'rank', 'danceability', 'energy', 'key', 'loudness
 df = pd.DataFrame(columns=columns)
 
 print("Fetching top tracks")
-top_tracks = get_top_tracks("14/09/2022", "30/09/2022")
+top_tracks = get_top_tracks("01/10/2022", "01/11/2022")
 trackIdList = []
 tracks = []
-for top_track in top_tracks[:50]:
+for top_track in top_tracks:
     new_track_features = {}
     print(f"Loading {top_track['title']} by {top_track['artist']}", )
     trackIdList.append(top_track['id'])
@@ -26,9 +26,11 @@ for i in range(0, len(trackIdList), 100):
     start = i
     end = i + 100 if i + 100 < len(trackIdList) else len(trackIdList)
     audio_features = get_audio_features(','.join(trackIdList[start:end]))
+    k = 0
     for j in range(start, end):
-        tracks[j].update(audio_features[j])
+        tracks[j].update(audio_features[k])
         df.loc[len(df.index)] = tracks[j]
+        k += 1
 
 print("Saving data")
 df.to_csv('top200.csv', index=False)

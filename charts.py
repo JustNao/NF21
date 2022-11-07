@@ -3,7 +3,7 @@ import json
 from datetime import datetime as dt, timedelta
 from time import sleep
 
-CHARTS_API_URL = "https://charts-spotify-com-service.spotify.com/auth/v0/charts/regional-global-weekly"
+CHARTS_API_URL = "https://charts-spotify-com-service.spotify.com/auth/v0/charts/regional-fr-weekly"
 CHARTS_TOKEN_URL = "http://everstone.ddns.net:1000/api/charts/"
 response = rq.get(CHARTS_TOKEN_URL)
 CHARTS_TOKEN = response.json()["token"]
