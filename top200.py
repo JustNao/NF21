@@ -1,7 +1,9 @@
-from spotify import get_audio_features
+import pandas as pd
+
 from charts import get_top_tracks
 from genius import get_lyrics
-import pandas as pd
+from spotify import get_audio_features
+from utils import printProgressBar
 
 columns = ['title', 'artist', 'rank', 'danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
            'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature', 'lyrics', 'id']
@@ -9,17 +11,21 @@ df = pd.DataFrame(columns=columns)
 
 print("Fetching top tracks")
 top_tracks = get_top_tracks("01/10/2022", "01/11/2022")
+
 trackIdList = []
 tracks = []
-for top_track in top_tracks:
+print("Fetching lyrics")
+printProgressBar(0, len(top_tracks), prefix = 'Progress:', suffix = 'Complete', length = 50)
+for index, top_track in enumerate(top_tracks):
     new_track_features = {}
-    print(f"Loading {top_track['title']} by {top_track['artist']}", )
+    # print(f"Loading {top_track['title']} by {top_track['artist']}", )
     trackIdList.append(top_track['id'])
     track_lyrics = get_lyrics(f"{top_track['title']} {top_track['artist']}")
     new_track_features['lyrics'] = track_lyrics.replace(
         '\n', ' ').replace(',', '')
     top_track.update(new_track_features)
     tracks.append(top_track)
+    printProgressBar(index + 1, len(top_tracks), prefix = 'Progress:', suffix = 'Complete', length = 50)
 
 print("Fetching audio features")
 for i in range(0, len(trackIdList), 100):
