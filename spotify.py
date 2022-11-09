@@ -42,6 +42,18 @@ def get_albums(album_ids: str, access_token: str = SPOTIFY_TOKEN):
     response_json = response.json()
     return response_json
 
+def get_artists(artist_ids: str, access_token: str = SPOTIFY_TOKEN):
+    track_url = f"{SPOTIFY_API_URL}/artists?ids={artist_ids}"
+    response = rq.get(track_url, headers={
+        "Authorization": "Bearer " + access_token
+    })
+    response_json = response.json()
+    if 'artists' in response_json:
+        artists = response_json['artists']
+    else:
+        artists = []
+    return artists
+
 
 def get_audio_features(track_id: str, access_token: str = SPOTIFY_TOKEN):
     track_url = f"{SPOTIFY_API_URL}/audio-features?ids={track_id}"
