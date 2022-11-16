@@ -10,7 +10,7 @@ columns = ['title', 'artist', 'rank', 'danceability', 'energy', 'key', 'loudness
 df = pd.DataFrame(columns=columns)
 
 print("Fetching top tracks")
-top_tracks = get_top_tracks("01/10/2022", "01/11/2022")
+top_tracks = get_top_tracks("01/11/2021", "01/11/2022")
 
 trackIdList = []
 tracks = []

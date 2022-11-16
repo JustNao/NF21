@@ -52,9 +52,18 @@ def _get_top(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
     return top_tracks
 
 
+seasons = {
+    1: "Winter",
+    2: "Spring",
+    3: "Summer",
+    4: "Autumn"
+}
+
 def get_top_tracks(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
     top_tracks = _get_top(start, end)
     mean = {}
+    start_date = dt.strptime(start, "%d/%m/%Y")
+    month = start_date.month
     for track in top_tracks:
         id = track["trackMetadata"]['trackUri'].split(":")[-1]
         if id not in mean:
@@ -69,12 +78,17 @@ def get_top_tracks(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
             mean[id]["count"] += 1
     result = []
     for id in mean:
-        result.append({
+        print(f"month: {month} -> {seasons[((month - 1)%12 // 3) + 1]}")
+        track = {
             "id": id,
             "streams": mean[id]["total_streams"] / mean[id]["count"],
             "title": mean[id]["title"],
             "artist": mean[id]["artist"],
-        })
+        }
+        current_season = seasons[((month - 1)%12 // 3) + 1]
+        for season in seasons:
+            track[seasons[season]] = 1 if season == current_season else 0
+        result.append(track)
     result = sorted(result, key=lambda x: x["streams"], reverse=True)
     for i in range(len(result)):
         result[i]["rank"] = i + 1
