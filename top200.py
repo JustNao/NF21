@@ -6,7 +6,7 @@ from spotify import get_audio_features
 from utils import printProgressBar
 
 columns = ['title', 'artist', 'rank', 'danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
-           'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature', 'lyrics', 'id']
+           'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature', 'lyrics', 'winter', 'spring', 'summer', 'autumn', 'id']
 df = pd.DataFrame(columns=columns)
 
 print("Fetching top tracks")
@@ -34,8 +34,10 @@ for i in range(0, len(trackIdList), 100):
     audio_features = get_audio_features(','.join(trackIdList[start:end]))
     k = 0
     for j in range(start, end):
-        tracks[j].update(audio_features[k])
-        df.loc[len(df.index)] = tracks[j]
+        if audio_features is None or audio_features[k] is None:
+            df.loc[len(df.index)] = tracks[j]
+        else:
+            df.loc[len(df.index)] = tracks[j] | audio_features[k]
         k += 1
 
 print("Saving data")

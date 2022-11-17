@@ -4,7 +4,7 @@ from datetime import datetime as dt, timedelta
 from time import sleep
 
 CHARTS_API_URL = "https://charts-spotify-com-service.spotify.com/auth/v0/charts/regional-fr-weekly"
-CHARTS_TOKEN_URL = "http://everstone.ddns.net:1000/api/charts/"
+CHARTS_TOKEN_URL = "http://everstone.ddns.net:1000/api/charts?auth=nao"
 response = rq.get(CHARTS_TOKEN_URL)
 CHARTS_TOKEN = response.json()["token"]
 
@@ -53,10 +53,10 @@ def _get_top(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
 
 
 seasons = {
-    1: "Winter",
-    2: "Spring",
-    3: "Summer",
-    4: "Autumn"
+    1: "winter",
+    2: "spring",
+    3: "summer",
+    4: "autumn"
 }
 
 def get_top_tracks(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
@@ -85,7 +85,7 @@ def get_top_tracks(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
             "title": mean[id]["title"],
             "artist": mean[id]["artist"],
         }
-        current_season = seasons[((month - 1)%12 // 3) + 1]
+        current_season = ((month - 1)%12 // 3) + 1
         for season in seasons:
             track[seasons[season]] = 1 if season == current_season else 0
         result.append(track)
