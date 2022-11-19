@@ -6,6 +6,12 @@ from utils import printProgressBar
 
 df = pd.read_csv('top200.csv')
 ids = df['id'].tolist()
+seasons = {
+    1: "winter",
+    2: "spring",
+    3: "summer",
+    4: "autumn"
+}
 
 # Getting all track data from the top 200
 print("Getting all track data from the top 200 ...", end=' ')
@@ -22,9 +28,8 @@ print("OK")
 print("Getting all album ids from the top 200 ...", end=' ')
 album_ids = []
 for track in track_data:
-    if track['album']['album_type'] != "single":
-        album = track['album']['uri'].split(':')[-1]
-        album_ids.append(album)
+    album = track['album']['uri'].split(':')[-1]
+    album_ids.append(album)
 print("OK")
 
 # Getting all album data from the top 200
@@ -37,6 +42,11 @@ for i in range(0, len(album_ids), 20):
     for album in batch:
         albums.append(album)
 print("OK")
+
+# Passing track season to album season
+for index, track in df.iterrows():
+    for season in seasons.values():
+        albums[index][season] = track[season]
 
 # Gettings all track ids from all albums
 print("Getting all track ids from all albums ...", end=' ')
@@ -79,12 +89,25 @@ final_tracks = []
 for album_id in formatted_tracks:
     formatted_tracks[album_id].sort(key=lambda x: x['popularity'])
     cleaned_album = filter(lambda track: \
-        track['duration'] > 60000 and \
+        track['duration_ms'] > 60000 and \
         'intro' not in track['name'].lower() and \
         'interlude' not in track['name'].lower() \
         , formatted_tracks[album_id])
-    for track in formatted_tracks[album_id][:3]:
-        final_tracks.append(track)
+    cleaned_album = list(cleaned_album)
+    if len(cleaned_album) > 3:
+        for track in cleaned_album[:3]:
+            final_tracks.append(track)
+
+# Passing album season to track season
+for track in final_tracks:
+    album_id = track['album']['id']
+    for album in albums:
+        if album['id'] == album_id:
+            for season in seasons.values():
+                track[season] = album[season]
+            break
+    if 'winter' not in track:
+        print(f"ERROR: Track {track['name']} not found in albums")
 
 print("Getting all lyrics ...")
 printProgressBar(0, len(final_tracks), prefix = 'Progress:', suffix = 'Complete', length = 50)
@@ -103,7 +126,7 @@ for index, bottom_track in enumerate(final_tracks):
     printProgressBar(index + 1, len(final_tracks), prefix = 'Progress:', suffix = 'Complete', length = 50)
 
 columns = ['title', 'artist', 'rank', 'danceability', 'energy', 'key', 'loudness', 'mode', 'speechiness', 'acousticness',
-           'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature', 'lyrics', 'id']
+           'instrumentalness', 'liveness', 'valence', 'tempo', 'duration_ms', 'time_signature', 'lyrics', 'winter', 'spring', 'summer', 'autumn', 'id']
 output_df = pd.DataFrame(columns=columns)
 
 print("Fetching audio features ...", end=' ')

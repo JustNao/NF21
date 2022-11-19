@@ -34,6 +34,13 @@ def get_weekly(week: str):
     return latest_list["entries"]
 
 
+seasons = {
+    1: "winter",
+    2: "spring",
+    3: "summer",
+    4: "autumn"
+}
+
 def _get_top(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
     start_date = dt.strptime(start, "%d/%m/%Y")
     end_date = dt.strptime(end, "%d/%m/%Y")
@@ -43,8 +50,13 @@ def _get_top(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
     top_tracks = []
     while start_date <= end_date:
         week = start_date.strftime("%Y-%m-%d")
+        month = start_date.month
         print(f"Getting charts for week of {week}")
         weekly_top = get_weekly(week)
+        for track in weekly_top:
+            track_season = (month % 12 + 3) // 3
+            for season in seasons:
+                track[seasons[season]] = 1 if season == track_season else 0
         top_tracks += weekly_top
         sleep(0.5)
         start_date += timedelta(days=7)
@@ -52,18 +64,9 @@ def _get_top(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
     return top_tracks
 
 
-seasons = {
-    1: "winter",
-    2: "spring",
-    3: "summer",
-    4: "autumn"
-}
-
 def get_top_tracks(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
     top_tracks = _get_top(start, end)
     mean = {}
-    start_date = dt.strptime(start, "%d/%m/%Y")
-    month = start_date.month
     for track in top_tracks:
         id = track["trackMetadata"]['trackUri'].split(":")[-1]
         if id not in mean:
@@ -73,21 +76,21 @@ def get_top_tracks(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
                 "total_streams": int(track["chartEntryData"]["rankingMetric"]["value"]),
                 "count": 1
             }
+            for season in seasons.values():
+                mean[id][season] = track[season]
         else:
             mean[id]["total_streams"] += int(track["chartEntryData"]["rankingMetric"]["value"])
             mean[id]["count"] += 1
     result = []
     for id in mean:
-        print(f"month: {month} -> {seasons[((month - 1)%12 // 3) + 1]}")
         track = {
             "id": id,
             "streams": mean[id]["total_streams"] / mean[id]["count"],
             "title": mean[id]["title"],
             "artist": mean[id]["artist"],
         }
-        current_season = ((month - 1)%12 // 3) + 1
-        for season in seasons:
-            track[seasons[season]] = 1 if season == current_season else 0
+        for season in seasons.values():
+            track[season] = mean[id][season]
         result.append(track)
     result = sorted(result, key=lambda x: x["streams"], reverse=True)
     for i in range(len(result)):
