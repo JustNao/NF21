@@ -41,4 +41,4 @@ for i in range(0, len(trackIdList), 100):
         k += 1
 
 print("Saving data")
-df.to_csv('top200.csv', index=False)
+df.to_csv('top200.csv', index=False, encoding='utf-8')

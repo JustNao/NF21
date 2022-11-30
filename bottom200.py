@@ -144,4 +144,4 @@ for i in range(0, len(track_id_list), 100):
 print("OK")
 
 print("Saving data")
-output_df.to_csv('bottom200.csv', index=False)
+output_df.to_csv('bottom200.csv', index=False, encoding='utf-8')
