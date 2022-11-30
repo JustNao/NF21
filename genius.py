@@ -34,11 +34,17 @@ def get_lyrics(title: str) -> str:
 
     lyrics_page = rq.get(lyrics_url)
     soup = bs(lyrics_page.text, 'html.parser')
-    data_container = soup.find('div', attrs={
-        'data-lyrics-container': True
+    data_container = soup.findAll('div', attrs={
+        'data-lyrics-container': 'true'
     })
     if data_container is None:
         return ""
 
-    lyrics = data_container.get_text(separator='\n')
+    lyrics = ""
+    for div in data_container:
+        lyrics += div.get_text(separator='\n')
+
+    if len(lyrics) > 10000:
+        return ""
+
     return lyrics
