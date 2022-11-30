@@ -81,6 +81,9 @@ def get_top_tracks(start: str, end: str = dt.now().strftime("%d/%m/%Y")):
         else:
             mean[id]["total_streams"] += int(track["chartEntryData"]["rankingMetric"]["value"])
             mean[id]["count"] += 1
+            for season in seasons.values():
+                if track[season] == 1:
+                    mean[id][season] = 1
     result = []
     for id in mean:
         track = {
